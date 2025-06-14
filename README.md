@@ -12,26 +12,36 @@ This project is a Python-based network scanner designed to identify devices on a
 
 ## Requirements
 
-To run this project, you need to have Python installed along with the required libraries. You can install the necessary dependencies using the following command:
+To run this project, you need to have Python installed along with the required libraries.  
+It is recommended to use a virtual environment (venv) to manage dependencies.
 
-```
-pip install -r requirements.txt
-```
+## Setup
 
-## Usage
-
-1. Clone the repository to your local machine:
+1. **Clone the repository to your local machine:**
    ```
    git clone <repository-url>
    cd netscan
    ```
 
-2. Run the network scanner:
+2. **Create and activate a virtual environment:**
+   ```
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. **Install the dependencies:**
+   ```
+   pip install -r requirements.txt
+   ```
+
+## Usage
+
+1. **Run the network scanner:**
    ```
    python src/netscan.py
    ```
 
-3. Follow the on-screen instructions to scan your network.
+2. **Follow the on-screen instructions to scan your network.**
 
 ## Contributing
 
