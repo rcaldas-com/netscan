@@ -15,6 +15,9 @@ This project is a Python-based network scanner designed to identify devices on a
 To run this project, you need to have Python installed along with the required libraries.  
 It is recommended to use a virtual environment (venv) to manage dependencies.
 
+> **Important:**  
+> This script must be run as root (or with sudo) to access the network interface and perform ARP scans.
+
 ## Setup
 
 1. **Clone the repository to your local machine:**
@@ -36,9 +39,9 @@ It is recommended to use a virtual environment (venv) to manage dependencies.
 
 ## Usage
 
-1. **Run the network scanner:**
+1. **Run the network scanner as root:**
    ```
-   python src/netscan.py
+   sudo venv/bin/python src/netscan.py
    ```
 
 2. **Follow the on-screen instructions to scan your network.**
