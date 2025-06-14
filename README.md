@@ -53,3 +53,14 @@ Contributions are welcome! If you have suggestions for improvements or new featu
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for more details.
+
+## Future Implementations
+
+The following features are planned for future versions of this project:
+
+1. **Detection of Routers/APs on Different Subnets:**  
+   Frequently, access points or routers operate in "access point" mode, where their management IP (LAN) is on a different subnet than the one the host is currently connected to. The scanner will attempt to "ping" and identify such devices by probing common IP addresses (e.g., .1, .100, .254) in typical private networks such as 192.168.0.0/24, 192.168.1.0/24, 192.168.100.0/24, 10.0.0.0/8, and 10.1.1.0/8. This will help discover routers/APs even if they are not in the same subnet as the scanning host.
+
+2. **Identification of the Connected Device in Wi-Fi Networks:**  
+   When connected via Wi-Fi, it is often useful to identify the specific device (AP or router) the host is associated with. The scanner will attempt to determine the MAC address of the device the host is connected to, then use this MAC to discover its IP address and gather as much information as possible about it. Sometimes this device is the default gateway, but in other cases, it may be just an access point in the path.
+
