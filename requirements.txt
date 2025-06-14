@@ -1,0 +1,6 @@
+scapy
+requests
+netifaces
+paramiko
+python-nmap
+ipaddress
