@@ -22,14 +22,17 @@ def scan_network(ip_range):
     
     devices = []
     for element in answered_list:
-        vprint(f"[+] Dispositivo encontrado: IP={element[1].psrc}, MAC={element[1].hwsrc}")
+        ip = element[1].psrc
+        mac = element[1].hwsrc
+        vprint(f"[+] Dispositivo encontrado: IP={ip}, MAC={mac}")
+        ports = scan_ports(ip)
         device_info = {
-            "ip": element[1].psrc,
-            "mac": element[1].hwsrc,
-            "brand": get_device_brand(element[1].hwsrc),
-            "model": get_device_model(element[1].hwsrc),
-            "credentials": get_access_credentials(element[1].psrc),
-            "ports": scan_ports(element[1].psrc)
+            "ip": ip,
+            "mac": mac,
+            "brand": get_device_brand(mac),
+            "ports": ports,
+            "model": get_device_model(ip, ports),
+            "credentials": get_access_credentials(ip)
         }
         devices.append(device_info)
     
@@ -48,9 +51,73 @@ def get_device_brand(mac_address):
         vprint(f"        [!] Erro ao consultar fabricante: {e}")
         return "Unknown Brand"
 
-def get_device_model(mac_address):
-    # Placeholder for MAC address lookup logic
-    vprint(f"    [.] Buscando modelo para MAC {mac_address}")
+
+def get_device_model(ip_address, open_ports):
+    """Tenta identificar o modelo do dispositivo via vários serviços."""
+    vprint(f"    [.] Tentando identificar modelo em {ip_address} nas portas {open_ports}")
+    # Tenta HTTP
+    if 80 in open_ports:
+        try:
+            url = f"http://{ip_address}"
+            response = requests.get(url, timeout=2)
+            vprint(f"        [HTTP] Status code: {response.status_code}")
+            if response.status_code == 200:
+                vprint("        [HTTP] Página recebida.")
+                vprint(response.text)
+                for line in response.text.splitlines():
+                    if "model" in line.lower() or "Model" in line:
+                        return line.strip()
+                if "<title>" in response.text:
+                    start = response.text.find("<title>") + 7
+                    end = response.text.find("</title>")
+                    return response.text[start:end].strip()
+        except Exception as e:
+            vprint(f"        [!] Erro HTTP: {e}")
+
+    # # Tenta HTTPS
+    # if 443 in open_ports:
+    #     try:
+    #         url = f"https://{ip_address}"
+    #         response = requests.get(url, timeout=2, verify=False)
+    #         if response.status_code == 200:
+    #             vprint("        [HTTPS] Página recebida.")
+    #             for line in response.text.splitlines():
+    #                 if "model" in line.lower() or "Model" in line:
+    #                     return line.strip()
+    #             if "<title>" in response.text:
+    #                 start = response.text.find("<title>") + 7
+    #                 end = response.text.find("</title>")
+    #                 return response.text[start:end].strip()
+    #     except Exception as e:
+    #         vprint(f"        [!] Erro HTTPS: {e}")
+
+    # # Tenta SSH
+    # if 22 in open_ports:
+    #     try:
+    #         import paramiko
+    #         ssh = paramiko.Transport((ip_address, 22))
+    #         ssh.connect(username="admin", password="admin")
+    #         banner = ssh.remote_version
+    #         ssh.close()
+    #         if banner:
+    #             vprint(f"        [SSH] Banner: {banner}")
+    #             return banner
+    #     except Exception as e:
+    #         vprint(f"        [!] Erro SSH: {e}")
+
+    # Tenta Telnet
+    if 23 in open_ports:
+        try:
+            import telnetlib
+            tn = telnetlib.Telnet(ip_address, 23, timeout=2)
+            banner = tn.read_until(b"\n", timeout=2).decode(errors="ignore")
+            tn.close()
+            if banner.strip():
+                vprint(f"        [Telnet] Banner: {banner.strip()}")
+                return banner.strip()
+        except Exception as e:
+            vprint(f"        [!] Erro Telnet: {e}")
+
     return "Unknown Model"
 
 def get_access_credentials(ip_address):
